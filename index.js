@@ -1,7 +1,6 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-const token = 'NzQwODE5MDYyMDE5MzI2MDQ1.XyujhA._s7pUfeo-zbiz7UFN4V0U6KY_bs';
-const prefix = '_';
 const fs = require('fs');
 
 bot.commands = new Discord.Collection();
@@ -23,8 +22,8 @@ bot.once('ready', ()=>
 
 bot.on('message', message=>
     {
-        if(!message.content.startsWith(prefix) || message.author.bot) return;
-        const args = message.content.slice(prefix.length).split(/ +/);
+        if(!message.content.startsWith(process.env.PREFIX) || message.author.bot) return;
+        const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
         const cmd = args[0].toLocaleLowerCase();
 
         switch(cmd)
@@ -33,20 +32,36 @@ bot.on('message', message=>
             case 'h':
                 bot.commands.get('help').execute(message, args);
                 console.log('HalBozt do help');
-                break;
-            
+                break;            
             case 'saysomething':
             case 'ss':
                 bot.commands.get('saysomething').execute(message, args);
-                console.log('HalBozt say something');
+                console.log('HalBozt say');
+                break;
+            case 'ban':
+                bot.commands.get('ban').execute(message, args);
+                console.log('HalBozt ban');
+                break;
+            case 'kick':
+                bot.commands.get('kick').execute(message, args);
+                console.log('HalBozt kick');
+                break;
+            case 'role':
+                bot.commands.get('role').execute(message, args);
+                console.log('HalBozt change role');
+                break;
+            case 'img':
+                bot.commands.get('img').execute(message, args);
+                console.log('HalBozt img');
+                break;
+            case 'message':
+            case 'msg':
+                bot.commands.get('message').execute(bot, message, args);
+                console.log('HalBozt send message');
                 break;
 
-            case 'gay':
-                bot.commands.get('gay').execute(message, args);
-                console.log('HalBozt gay');
-                break;
         }
     }
 )
 
-bot.login(token);
+bot.login(process.env.DISCORD_TOKEN);
