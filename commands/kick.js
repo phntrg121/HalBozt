@@ -18,7 +18,7 @@ module.exports =
             }
             else
             {
-                message.channel.send(user.toString() + ' không có quyền kick');
+                message.channel.send(user.toString() + ' không thể bị kick');
             }
         }   
     }

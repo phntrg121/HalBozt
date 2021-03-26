@@ -1,71 +1,66 @@
-module.exports =
-{
-    name: 'role',
+import { RickEmbed, Client } from 'discord.js';
 
-    hasPermission: function checkPerm(message) {
-        if(!message.member.permissions.has("MANAGE_ROLES_OR_PERMISSIONS")) return false;
-        return true;
-    },
+export const name = 'role';
 
-    addrole: function addrole(role, mem, message)
-    {
-        if(this.hasPermission(message))
-        {
-            if(mem.roles.cache.has(role))
-            {
-                mem.roles.remove(role);
-            }
-            else
-            {
-                mem.roles.add(role);
-            } 
-            message.react("☑️");
-        }
-        else
-        {
-            message.channel.send(user.toString() + ' không có quyền sửa role');
-        }
-    },
+const hasPermission = function checkPerm(message) {
+    if (!message.member.permissions.has("MANAGE_ROLES_OR_PERMISSIONS"))
+        return false;
+    return true;
+};
 
-    execute(message, args)
-    {
-        const MOD_ROLE = '735155120496443513';
-        const HUE_ROLE = '729384990076436550';
-        const EX_ROLE = '729551734590144532';
-        const MASTER_ROLE = '729390153784885268';
-        const DOCTOR_ROLE = '735502501867946085';
-
-        var mem;
-        if(message.mentions.users.size === 1)
-        {
-            mem = message.mentions.members.first();
-        }
-        else
-        {
-            mem = message.member;
+function addrole(role, mem, message) {
+    if (this.hasPermission(message)) {
+        if (mem.roles.cache.has(role)) {
+            mem.roles.remove(role);
         }
 
-        if(args.length === 1)
-        {
-            message.chanel.send(message.guild.roles);
+        else {
+            mem.roles.add(role);
         }
-        else if(args.length > 1)
-        {
-            switch(args[1])
-            {
-                case 'ex':
-                    this.addrole(EX_ROLE,mem,message)
-                    break;
-                case 'hue':
-                    this.addrole(HUE_ROLE,mem,message);
-                    break;
-                case 'master':
-                    this.addrole(MASTER_ROLE,mem,message);
-                    break;
-                case 'doctor':
-                    this.addrole(DOCTOR_ROLE,mem,message);
-                    break;
-            }
+        message.react("☑️");
+    }
+
+    else {
+        var embed = new RickEmbed();
+
+        embed.setAuthor(Client.user.username);
+
+        message.channel.send(user.toString() + ' don\'t have permission');
+    }
+}
+
+export function execute(message, args) {
+    const MASTER_ROLE = process.env.MASTER_ROLE;
+    const DOCTOR_ROLE = process.env.DOCTOR_ROLE;
+    const TRAVELER_ROLE = process.env.TRAVELER_ROLE;
+
+    var mem;
+    if (message.mentions.users.size > 1)
+        return;
+
+    if (message.mentions.users.size === 1) {
+        mem = message.mentions.members.first();
+    }
+
+    else {
+        mem = message.member;
+    }
+
+    if (args.length === 1) {
+        console.log(message.guild.roles);
+        //message.chanel.send(message.guild.roles);
+    }
+    else if (args.length > 1) {
+        switch (args[1]) {
+            case 'master':
+                this.addrole(MASTER_ROLE, mem, message);
+                break;
+            case 'doctor':
+                this.addrole(DOCTOR_ROLE, mem, message);
+                break;
+            case 'traveler':
+                this.addrole(TRAVELER_ROLE, mem, message);
+                break;
         }
     }
 }
