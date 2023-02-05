@@ -1,6 +1,6 @@
 require('dotenv').config();
-const { REST, Routes, Client, GatewayIntentBits } = require('discord.js');
-const bot = new Client({ intents: [GatewayIntentBits.Guilds] });
+const { REST, Routes, Client, Events, GatewayIntentBits } = require('discord.js');
+const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] });
 const Valorant = require('./commands/valorant');
 const valorant = new Valorant()
 
@@ -11,106 +11,146 @@ const commands = [
     },
     {
         name: 'riot',
-        description: 'Login riot auth!',        
-    },   
+        description: 'Login riot!',
+    },
     {
-        name: 'riot2',
-        description: 'Login riot auth2!',        
+        name: 'store',
+        description: 'Get daily valorant store!',
     },
     {
         name: 'logout',
-        description: 'Logout riot!',        
+        description: 'Logout riot!',
     }
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
-  try {
-    console.log('Started refreshing application (/) commands.');
+    try {
+        console.log('Started refreshing application (/) commands.');
 
-    await rest.put(Routes.applicationCommands(process.env.DISCORD_CLIENT_ID), { body: commands });
+        await rest.put(Routes.applicationCommands(process.env.DISCORD_CLIENT_ID), { body: commands });
 
-    console.log('Successfully reloaded application (/) commands.');
-  } catch (error) {
-    console.error(error);
-  }
+        console.log('Successfully reloaded application (/) commands.');
+    } catch (error) {
+        console.error(error);
+    }
 })();
 
-bot.once('ready', ()=>
-    {
-        console.log('HalBozt is online!');
-    }
+bot.once(Events.ClientReady, () => {
+    console.log('HalBozt is online!');
+}
 )
 
-bot.on('interactionCreate', async interaction =>
-    {
-        if (!interaction.isChatInputCommand()) return;
+bot.on(Events.MessageCreate, async message => {
+    if (!message.content.startsWith(process.env.PREFIX) || message.author.bot) return;
+    const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
+    const cmd = args[0].toLocaleLowerCase();
 
-        if (interaction.commandName === 'ping') {
-            await interaction.reply('Pong!');
-        }
+    switch (cmd) {
+        case 'auth2': {
+            let msg = 'Command excuted'
+            let code = args[1]
 
-        if(interaction.commandName === 'riot') {
-            let message = 'Command excuted'
-
-            try{
-                const result = await valorant.authentication(process.env.LOGNAME, process.env.PASSWORD)
-                if(result.status == 'OK'){
-                    message = 'Authenticate successfully'
+            try {
+                const result = await valorant.authentication2(code)
+                if (result == 'OK') {
+                    await valorant.getEntitlement()
+                    msg = 'Authenticate successfully'
                 }
-                else{
-                    message = 'Check your email for mfa code and do the MFA command'
+                else {
+                    msg = 'Code expired'
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err)
-                message = 'Something wrong happened'
+                msg = 'Something wrong happened'
             }
             finally {
-                await interaction.reply(message);
+                message.channel.send(msg);
             }
+            break;
         }
 
-        if(interaction.commandName === 'riot2') {
-            let message = 'Command excuted'
-
-            try{
-                const result = await valorant.authentication2(process.env.MULTIFACTORCODE)
-                if(result.status == 'OK'){
-                    message = 'Authenticate successfully'
-                }
-                else{
-                    message = 'Code expired'
-                }
+        case 'store-update': {
+            try {
+                await valorant.storeUpdate()
+                message.channel.send('Store content updated');
             }
-            catch(err){
+            catch (err) {
                 console.log(err)
-                message = 'Something wrong happened'
+                message.channel.send('Something wrong happened');
             }
-            finally {
-                await interaction.reply(message);
-            }
-        }
 
-        if(interaction.commandName === 'logout') {
-            let message = 'Command excuted'
-
-            try{
-                const result = await valorant.logOut()
-                if(result.status == 'OK'){
-                    message = 'Logout successfully'
-                }
-            }
-            catch(err){
-                console.log(err)
-                message = 'Something wrong happened'
-            }
-            finally {
-                await interaction.reply(message);
-            }
+            break;
+            break;
         }
     }
+})
+
+bot.on(Events.InteractionCreate, async interaction => {
+    if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === 'ping') {
+        await interaction.reply('Pong!');
+    }
+
+    if (interaction.commandName === 'riot') {
+        let message = 'Command excuted'
+
+        try {
+            const result = await valorant.authentication(process.env.LOGNAME, process.env.PASSWORD)
+            if (result == 'OK') {
+                await valorant.getEntitlement()
+                message = 'Authenticate successfully'
+            }
+            if (result == 'MFA') {
+                message = 'Check your email for mfa code and do type \"``auth2 <code>\"'
+            }
+        }
+        catch (err) {
+            console.log(err)
+            message = 'Something wrong happened'
+        }
+        finally {
+            await interaction.reply(message);
+        }
+    }
+
+    if (interaction.commandName === 'store') {
+        let message = 'Command excuted'
+
+        try {
+            list = await valorant.getDailyStore()
+            message = `Today shop:\n - ${list[0]}\n - ${list[1]}\n - ${list[2]}\n - ${list[3]}`
+        }
+        catch (err) {
+            console.log(err)
+            message = 'Something wrong happened'
+        }
+        finally {
+            await interaction.reply(message);
+        }
+    }
+
+    if (interaction.commandName === 'logout') {
+        let message = 'Command excuted'
+
+        try {
+            const response = await valorant.logOut()
+            if (response.status == 200) {
+                message = 'Logout successfully'
+            }
+        }
+        catch (err) {
+            console.log(err)
+            message = 'Something wrong happened'
+        }
+        finally {
+            await interaction.reply(message);
+        }
+    }
+}
 )
 
 bot.login(process.env.DISCORD_TOKEN);

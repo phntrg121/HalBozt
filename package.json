@@ -15,16 +15,16 @@
     "dotenv": "^8.2.0"
   },
   "engines": {
-    "node": "16.6.1",
-    "npm": "6.14.6"
+    "node": "v18.14.0",
+    "npm": "9.3.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hal5s1210/HalBozt.git"
+    "url": "git+https://github.com/phntrg121/HalBozt"
   },
   "keywords": [],
   "bugs": {
-    "url": "https://github.com/Hal5s1210/HalBozt/issues"
+    "url": "https://github.com/phntrg121/HalBozt/issues"
   },
-  "homepage": "https://github.com/Hal5s1210/HalBozt#readme"
+  "homepage": "https://github.com/phntrg121/HalBozt#readme"
 }
