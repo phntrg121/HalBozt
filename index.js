@@ -64,7 +64,7 @@ bot.on(Events.MessageCreate, async message => {
             }
             catch (err) {
                 console.log(err)
-                msg = 'Something wrong happened'
+                msg = 'Error'
             }
             finally {
                 message.channel.send(msg);
@@ -74,15 +74,14 @@ bot.on(Events.MessageCreate, async message => {
 
         case 'store-update': {
             try {
-                await valorant.storeUpdate()
+                valorant.storeUpdate()
                 message.channel.send('Store content updated');
             }
             catch (err) {
                 console.log(err)
-                message.channel.send('Something wrong happened');
+                message.channel.send('Error');
             }
 
-            break;
             break;
         }
     }
@@ -110,7 +109,7 @@ bot.on(Events.InteractionCreate, async interaction => {
         }
         catch (err) {
             console.log(err)
-            message = 'Something wrong happened'
+            message = 'Error'
         }
         finally {
             await interaction.reply(message);
@@ -126,7 +125,7 @@ bot.on(Events.InteractionCreate, async interaction => {
         }
         catch (err) {
             console.log(err)
-            message = 'Something wrong happened'
+            message = 'Error'
         }
         finally {
             await interaction.reply(message);
@@ -144,7 +143,7 @@ bot.on(Events.InteractionCreate, async interaction => {
         }
         catch (err) {
             console.log(err)
-            message = 'Something wrong happened'
+            message = 'Error'
         }
         finally {
             await interaction.reply(message);

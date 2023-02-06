@@ -8,7 +8,7 @@ const VAL_STORE_URL = 'https://pd.ap.a.pvp.net/store/v2/storefront/'
 const LOGOUT_URL = 'https://auth.riotgames.com/logout'
 const USER_AGENT = '63.0.5.4887690.4789131 rso-auth (Windows;10;;Professional, x64)'
 
-const axiosInstance = axios.create()
+var axiosInstance = axios.create()
 
 var _access_token
 var _entitlement
@@ -49,20 +49,6 @@ Valorant.prototype.authentication = async function (username, password) {
             result = 'ERR'
         }
     }
-
-    // createSession().then(async ()=>{
-    //     const res_auth = await authUser(axiosInstance, username, password);
-    //     if(res_auth.status == 200){
-    //         const cookies = res_auth.headers['set-cookie']
-    //         axiosInstance.defaults.headers.Cookie = cookies
-    //         console.log(res_auth)
-    //         console.log('------------------------------------auhtUser success-------------------------------------')
-    //         if(res_auth.data.type= 'multifactor'){
-    //             result.status = 'MFA'
-    //         }
-    //         else result.status = 'OK'
-    //     }
-    // })
 
     return result
 }
@@ -116,12 +102,6 @@ Valorant.prototype.getEntitlement = async function (code) {
 }
 
 Valorant.prototype.getDailyStore = async function (userId, authToken, entitlementToken) {
-    // var storeList = [
-    //     '9336ab9d-445c-0872-a283-9f9b61a0098a',
-    //     '12831559-44ee-c708-b97c-29a43938e3cd',
-    //     'b2f78500-4322-b03d-2745-a3b2208d63fe',
-    //     'e34039b6-441d-3e17-2773-bdaf5c3d2faa'
-    // ]
     var storeList = []
 
     const response = await getStore(axiosInstance, _user_id, _access_token, _entitlement)
@@ -133,19 +113,19 @@ Valorant.prototype.getDailyStore = async function (userId, authToken, entitlemen
         console.log(storeList)
     }
 
-    // return storeList
     return getListItem(storeList)
 }
 
 Valorant.prototype.logOut = async function () {
-    const response = await logOut(axios)
-    if (response.status == 200) {
-        const cookies = response.headers['set-cookie']
-        axiosInstance.defaults.headers.Cookie = cookies
-        console.log(response)
-        console.log('------------------------------------logout success-------------------------------------')
-        _access_token = _user_id = _entitlement = ''
-    }
+    // const response = await logOut(axios)
+    // if (response.status == 200) {
+    //     const cookies = response.headers['set-cookie']
+    //     axiosInstance.defaults.headers.Cookie = cookies
+    //     console.log(response)
+    //     console.log('------------------------------------logout success-------------------------------------')
+    // }
+    axiosInstance = axios.create()
+    _access_token = _user_id = _entitlement = ''
 }
 
 Valorant.prototype.storeUpdate = function () {
@@ -160,16 +140,6 @@ Valorant.prototype.storeUpdate = function () {
 
 module.exports = Valorant
 
-async function createSession() {
-    const response = await authCookie(axiosInstance);
-    if (response.status == 200) {
-        const cookie = response.headers['set-cookie']
-        console.log(cookie)
-        axiosInstance.defaults.headers.Cookie = cookie
-        console.log(response)
-        console.log('--------------------------auhtCookie success---------------------------------')
-    }
-}
 
 function getToken(uri) {
     let pos1 = uri.search('access_token=') + 13
